@@ -3,8 +3,11 @@
 #include "lm75bd.h"
 #include "errors.h"
 
+#define T_HYS 75
+
 typedef enum {
   THERMAL_MGR_EVENT_MEASURE_TEMP_CMD,
+  OS_MGR_EVENT_OVER_TEMP,
   
 } thermal_mgr_event_type_t;
 
