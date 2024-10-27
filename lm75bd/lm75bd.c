@@ -34,15 +34,19 @@ error_code_t readTempLM75BD(uint8_t devAddr, float *temp) {
   
   error_code_t errCode;
   uint8_t buf[1] = {0x00};
-  uint8_t tempData[2] = {0};
+  uint8_t tempData[2];
 
   RETURN_IF_ERROR_CODE(i2cSendTo(devAddr, buf, sizeof(buf)));
   RETURN_IF_ERROR_CODE(i2cReceiveFrom(devAddr, tempData, sizeof(tempData)));
 
-  uint16_t temperature = (tempData[0] << 8 | tempData[1]);
-  int16_t t = temperature >> 5;
+  uint16_t rawTemp = (tempData[0] << 8 | tempData[1]);
+  int16_t temperature = rawTemp >> 5;
 
-  *temp = t * 0.125;
+  if(temperature & 0x0400) { 
+    temperature |= 0xFC00;
+  } 
+
+  *temp = temperature * 0.125;
 
   return ERR_CODE_SUCCESS;
 }
