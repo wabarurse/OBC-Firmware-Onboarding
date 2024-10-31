@@ -50,7 +50,7 @@ error_code_t thermalMgrSendEvent(thermal_mgr_event_t *event) {
     return ERR_CODE_INVALID_STATE;
   }
   
-  if(xQueueSend(thermalMgrQueueHandle, event, (TickType_t) 0) != pdTRUE) {
+  if(xQueueSend(thermalMgrQueueHandle, event, (TickType_t) portMAX_DELAY) != pdTRUE) {
     return ERR_CODE_QUEUE_FULL;
   }
   return ERR_CODE_SUCCESS;
