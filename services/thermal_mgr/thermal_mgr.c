@@ -59,24 +59,26 @@ error_code_t thermalMgrSendEvent(thermal_mgr_event_t *event) {
 void osHandlerLM75BD(void) {
   /* Implement this function */
   thermal_mgr_event_t event = { .type = THERMAL_MGR_EVENT_OS_OVER_TEMP };
-  xQueueSend(thermalMgrQueueHandle, &event, (TickType_t) 10);
+  thermalMgrSendEvent(&event);
 }
 
 static void thermalMgr(void *pvParameters) {
   /* Implement this task */
   thermal_mgr_event_t event;
   error_code_t errCode;
-  float temp;
+  
 
   while (1) {
-    if(xQueueReceive(thermalMgrQueueHandle, &event, (TickType_t) portMAX_DELAY) == pdTRUE) {
+    if(xQueueReceive(thermalMgrQueueHandle, &event, portMAX_DELAY) == pdTRUE) {
       if(event.type == THERMAL_MGR_EVENT_MEASURE_TEMP_CMD) {
+        float temp;
         errCode = readTempLM75BD(LM75BD_OBC_I2C_ADDR, &temp);
         LOG_IF_ERROR_CODE(errCode);
         if(errCode == ERR_CODE_SUCCESS) {
           addTemperatureTelemetry(temp);
         } 
       } else if(event.type == THERMAL_MGR_EVENT_OS_OVER_TEMP) {
+          float temp;
           errCode = readTempLM75BD(LM75BD_OBC_I2C_ADDR, &temp);
           LOG_IF_ERROR_CODE(errCode);
           if(errCode == ERR_CODE_SUCCESS) {
